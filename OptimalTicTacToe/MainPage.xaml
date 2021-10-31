@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OptimalTicTacToe.MainPage">
+
+    <StackLayout>
+        <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+            <Label Text="Optimal Tic Tac Toe" HorizontalTextAlignment="Center" TextColor="White" FontSize="Title"/>
+        </Frame>
+        <Label Text="Optimal Tic Tac Toe helps you perfect your skills.  Choose an option below to hone that aspect of your gameplay." FontSize="16" Padding="30,10,30,10"/>
+		<Button Text="Offense" Margin="50,10" Padding="0,20"/>
+		<Button Text="Defense" Margin="50,10" Padding="0,20"/>
+		<Button Text="Free Play" Margin="50,10" Padding="0,20"/>
+	</StackLayout>
+
+</ContentPage>
