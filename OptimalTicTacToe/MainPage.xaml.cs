@@ -14,5 +14,10 @@ namespace OptimalTicTacToe
 		{
 			InitializeComponent();
 		}
+
+		private void Offense_Clicked(object sender, EventArgs e)
+		{
+			Navigation.PushModalAsync(new OffensePage());
+		}
 	}
 }

@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OptimalTicTacToe.OffensePage">
+	<ContentPage.Resources>
+		<Style TargetType="BoxView">
+			<Setter Property="BackgroundColor" Value="Black"/>
+			<Setter Property="CornerRadius" Value="3"/>
+		</Style>
+
+		<Style x:Key="GameSquareLabel" TargetType="Label">
+			<Setter Property="HeightRequest" Value="{Binding Source={RelativeSource Self}, Path=Width}"/>
+			<Setter Property="HorizontalTextAlignment" Value="Center"/>
+			<Setter Property="VerticalTextAlignment" Value="Center"/>
+			<Setter Property="FontSize" Value="48"/>
+			<Setter Property="Text" Value="X"/>
+		</Style>
+	</ContentPage.Resources>
+	
+	<ContentPage.Content>
+		<StackLayout>
+			<Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+				<Label Text="Offense" HorizontalTextAlignment="Center" TextColor="White" FontSize="Title"/>
+			</Frame>
+			<Label Text="The O player makes a fatal mistake in each of these games, guaranteeing an X win if played optimally.  Win the game." FontSize="16" Padding="30,10,30,10"/>
+
+			<Grid Margin="50">
+				<Grid.Resources>
+					<ResourceDictionary>
+						<x:Double x:Key="GridLineWidth">7</x:Double>
+					</ResourceDictionary>
+				</Grid.Resources>
+				
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="{StaticResource GridLineWidth}"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="{StaticResource GridLineWidth}"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="{StaticResource GridLineWidth}"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="{StaticResource GridLineWidth}"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				
+				<BoxView Grid.Column="1" Grid.RowSpan="5"/>
+				<BoxView Grid.Column="3" Grid.RowSpan="5"/>
+				<BoxView Grid.Row="1" Grid.ColumnSpan="5"/>
+				<BoxView Grid.Row="3" Grid.ColumnSpan="5"/>
+
+				<Label  Grid.Row="0" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="0" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="0" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="2" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="2" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="2" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="4" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="4" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
+				<Label  Grid.Row="4" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
+			</Grid>
+
+			<Label HorizontalOptions="Center">
+				<Label.FormattedText>
+					<FormattedString>
+						<Span Text="Current Streak: " TextColor="Black"/>
+						<Span Text="0 Wins" TextColor="Green"/>
+					</FormattedString>
+				</Label.FormattedText>
+			</Label>
+
+			<Label HorizontalOptions="Center">
+				<Label.FormattedText>
+					<FormattedString>
+						<Span Text="Record: " TextColor="Black"/>
+						<Span Text="0 Wins" TextColor="Green"/>
+					</FormattedString>
+				</Label.FormattedText>
+			</Label>
+
+
+			<Label Text="by Scot Senyk" HorizontalOptions="Center" VerticalOptions="EndAndExpand"/>
+		</StackLayout>
+		
+	</ContentPage.Content>
+</ContentPage>

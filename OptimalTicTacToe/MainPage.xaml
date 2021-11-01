@@ -8,9 +8,10 @@
             <Label Text="Optimal Tic Tac Toe" HorizontalTextAlignment="Center" TextColor="White" FontSize="Title"/>
         </Frame>
         <Label Text="Optimal Tic Tac Toe helps you perfect your skills.  Choose an option below to hone that aspect of your gameplay." FontSize="16" Padding="30,10,30,10"/>
-		<Button Text="Offense" Margin="50,10" Padding="0,20"/>
+		<Button Text="Offense" Margin="50,10" Padding="0,20" Clicked="Offense_Clicked"/>
 		<Button Text="Defense" Margin="50,10" Padding="0,20"/>
 		<Button Text="Free Play" Margin="50,10" Padding="0,20"/>
+		<Label Text="by Scot Senyk" HorizontalOptions="Center" VerticalOptions="EndAndExpand"/>
 	</StackLayout>
 
 </ContentPage>
