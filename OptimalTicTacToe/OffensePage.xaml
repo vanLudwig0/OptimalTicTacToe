@@ -8,12 +8,11 @@
 			<Setter Property="CornerRadius" Value="3"/>
 		</Style>
 
-		<Style x:Key="GameSquareLabel" TargetType="Label">
+		<Style x:Key="GameSquareButton" TargetType="Button">
 			<Setter Property="HeightRequest" Value="{Binding Source={RelativeSource Self}, Path=Width}"/>
-			<Setter Property="HorizontalTextAlignment" Value="Center"/>
-			<Setter Property="VerticalTextAlignment" Value="Center"/>
 			<Setter Property="FontSize" Value="48"/>
-			<Setter Property="Text" Value="X"/>
+			<Setter Property="BackgroundColor" Value="Transparent"/>
+			<Setter Property="Text" Value="{Binding Path=Value, Mode=TwoWay}"/>
 		</Style>
 	</ContentPage.Resources>
 	
@@ -52,15 +51,15 @@
 				<BoxView Grid.Row="1" Grid.ColumnSpan="5"/>
 				<BoxView Grid.Row="3" Grid.ColumnSpan="5"/>
 
-				<Label  Grid.Row="0" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="0" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="0" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="2" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="2" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="2" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="4" Grid.Column="0" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="4" Grid.Column="2" Style="{StaticResource GameSquareLabel}" />
-				<Label  Grid.Row="4" Grid.Column="4" Style="{StaticResource GameSquareLabel}" />
+				<Button BindingContext="{Binding GameBoard.Squares[0]}" Grid.Row="0" Grid.Column="0" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[1]}" Grid.Row="0" Grid.Column="2" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[2]}" Grid.Row="0" Grid.Column="4" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[3]}" Grid.Row="2" Grid.Column="0" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[4]}" Grid.Row="2" Grid.Column="2" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[5]}" Grid.Row="2" Grid.Column="4" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[6]}" Grid.Row="4" Grid.Column="0" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[7]}" Grid.Row="4" Grid.Column="2" Style="{StaticResource GameSquareButton}" />
+				<Button BindingContext="{Binding GameBoard.Squares[8]}" Grid.Row="4" Grid.Column="4" Style="{StaticResource GameSquareButton}" />
 			</Grid>
 
 			<Label HorizontalOptions="Center">

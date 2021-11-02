@@ -12,9 +12,13 @@ namespace OptimalTicTacToe
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class OffensePage : ContentPage
 	{
+		public GameEngine.Board GameBoard { get; set; } = new GameEngine.Board();
+
 		public OffensePage()
 		{
 			InitializeComponent();
+
+			BindingContext = this;
 		}
 	}
 }

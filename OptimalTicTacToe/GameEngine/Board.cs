@@ -36,7 +36,20 @@ namespace OptimalTicTacToe.GameEngine
 		});
 
 		//Do the same for most useful categories of Squares
-		private Square[] _corners = null, _edges = null, _centers = null;
+		private Square[] _squares = null, _corners = null, _edges = null, _centers = null;
+		public Square[] Squares => _squares ?? (_squares = new Square[]
+		{
+			Square[0, 0],
+			Square[1, 0],
+			Square[2, 0],
+			Square[0, 1],
+			Square[1, 1],
+			Square[2, 1],
+			Square[0, 2],
+			Square[1, 2],
+			Square[2, 2]
+		});
+
 		public Square[] Corners => _corners ?? (_corners = new Square[]
 		{
 			Square[0, 0],
@@ -59,7 +72,6 @@ namespace OptimalTicTacToe.GameEngine
 		});
 
 
-		public IEnumerable<Square> Squares => Rows.SelectMany(s => s);
 		public IEnumerable<Square> EmptySquares => Squares.Where(s => s.Empty);
 		public IEnumerable<Square> XSquares => Squares.Where(s => s.X);
 		public IEnumerable<Square> OSquares => Squares.Where(s => s.O);

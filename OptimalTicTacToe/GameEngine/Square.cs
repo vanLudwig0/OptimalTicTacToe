@@ -6,7 +6,7 @@ namespace OptimalTicTacToe.GameEngine
 {
 	public class Square
 	{
-		public string Value { get; set; } = "O";
+		public string Value { get; set; } = "";
 
 		public bool Empty => Value == "";
 		public bool X => Value == "X";
