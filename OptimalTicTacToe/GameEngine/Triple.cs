@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OptimalTicTacToe.GameEngine
 {
@@ -27,6 +28,26 @@ namespace OptimalTicTacToe.GameEngine
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public bool AllX() => _square.All(s => s.X);
+		public bool AllO() => _square.All(s => s.O);
+		public bool AllEmpty() => _square.All(s => s.Empty);
+		public bool AnyX() => _square.Any(s => s.X);
+		public bool AnyO() => _square.Any(s => s.O);
+		public bool AnyEmpty() => _square.Any(s => s.Empty);
+		public bool WinnableX() => CountX() == 2 && CountEmpty() == 1;
+		public bool WinnableO() => CountO() == 2 && CountEmpty() == 1;
+
+		public bool Mixed() => _square.Any(s => s.X) && _square.Any(s => s.O);
+
+		public int CountX() => _square.Count(s => s.X);
+		public int CountO() => _square.Count(s => s.O);
+		public int CountEmpty() => _square.Count(s => s.Empty);
+
+		public override string ToString()
+		{
+			return string.Join("", _square.Select(s => s.ToString()));
 		}
 	}
 }
