@@ -40,13 +40,13 @@ namespace OptimalTicTacToe.GameEngine
 		public Square[] Squares => _squares ?? (_squares = new Square[]
 		{
 			Square[0, 0],
-			Square[1, 0],
-			Square[2, 0],
 			Square[0, 1],
-			Square[1, 1],
-			Square[2, 1],
 			Square[0, 2],
+			Square[1, 0],
+			Square[1, 1],
 			Square[1, 2],
+			Square[2, 0],
+			Square[2, 1],
 			Square[2, 2]
 		});
 

@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimalTicTacToe.Android", "OptimalTicTacToe.Android\OptimalTicTacToe.Android.csproj", "{78611FE9-309C-4845-B404-CA66C7D5DCFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimalTicTacToe", "OptimalTicTacToe\OptimalTicTacToe.csproj", "{620B77F0-A8B2-4E44-AAB8-D4CB42730D97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OptimalTicTacToe", "OptimalTicTacToe\OptimalTicTacToe.csproj", "{620B77F0-A8B2-4E44-AAB8-D4CB42730D97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EDE1A26B-66D8-4EBC-81FD-428A2ED9B2EC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

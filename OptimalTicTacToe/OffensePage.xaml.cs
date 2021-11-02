@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -20,5 +20,11 @@ namespace OptimalTicTacToe
 
 			BindingContext = this;
 		}
+
+		public ICommand Square_Clicked { get; } = new Command( (sender) =>
+		{
+			if (sender is Button button && button.Text == "")
+				button.Text = "X";
+		});
 	}
 }

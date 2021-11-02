@@ -13,6 +13,8 @@
 			<Setter Property="FontSize" Value="48"/>
 			<Setter Property="BackgroundColor" Value="Transparent"/>
 			<Setter Property="Text" Value="{Binding Path=Value, Mode=TwoWay}"/>
+			<Setter Property="Command" Value="{Binding Path=Square_Clicked,Source={RelativeSource AncestorType={x:Type ContentPage}}}"/>
+			<Setter Property="CommandParameter" Value="{Binding Path=.,Source={RelativeSource Self}}"/>
 		</Style>
 	</ContentPage.Resources>
 	
