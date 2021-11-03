@@ -30,7 +30,7 @@ namespace OptimalTicTacToe.GameEngine
 
 		public override string ToString()
 		{
-			return X ? " X " : O ? " O " : Empty ? " ▪ " : " # ";
+			return X ? "X" : O ? "O" : Empty ? "_" : "#";
 		}
 	}
 }

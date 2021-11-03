@@ -28,8 +28,12 @@ namespace OptimalTicTacToe
 			{
 				GameBoard.Clear();
 				GameBoard.EmptyOutsides.RandomOrDefault().Value = "X";
-				GameBoard.EmptyOutsides.RandomOrDefault().Value = "O";
-			} while (GameBoard.Middles.Any(t => t.Mixed()) || GameBoard.Triples.Any(t => t[1].X));
+				GameBoard.EmptySquares.RandomOrDefault().Value = "O";
+
+				if (GameBoard.Middles.Any(t => t.Mixed())) continue;	//Unwinnable
+				if (GameBoard.Mixeds().Any(t => t[1].X)) continue;	//Unwinnable
+				break;
+			} while (true);
 		}
 
 		private async void Clicked(object sender, EventArgs e)
@@ -78,6 +82,14 @@ namespace OptimalTicTacToe
 				ResetBoard();
 				return;
 			}
+
+			//Make an intentional mistake when the first O is in the center
+			if (GameBoard.EmptySquares.Count() == 6 && GameBoard.Diagonals.Any(t => t.Matches("XOX")))
+			{
+				GameBoard.Corners.Where(s => s.Empty).RandomOrDefault().Value = "O";
+				return;
+			}
+
 
 			//Block an X win
 			var loseable = GameBoard.WinnableX().RandomOrDefault();

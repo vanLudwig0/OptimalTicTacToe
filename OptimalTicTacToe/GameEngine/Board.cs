@@ -95,6 +95,8 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Triple> Triples => Rows.Concat(Columns).Concat(Diagonals);
 		public IEnumerable<Triple> WinnableX() => Triples.Where(t => t.WinnableX());
 		public IEnumerable<Triple> WinnableO() => Triples.Where(t => t.WinnableO());
+		public IEnumerable<Triple> Mixeds() => Triples.Where(t => t.Mixed());
+		public IEnumerable<Triple> Matches(string regex) => Triples.Where(t => t.Matches(regex));
 
 		public void Clear()
 		{

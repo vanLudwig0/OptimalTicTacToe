@@ -45,6 +45,16 @@ namespace OptimalTicTacToe.GameEngine
 		public int CountO() => _square.Count(s => s.O);
 		public int CountEmpty() => _square.Count(s => s.Empty);
 
+		public IEnumerable<Square> EmptySquares() => _square.Where(s => s.Empty);
+		public IEnumerable<Square> XSquares() => _square.Where(s => s.X);
+		public IEnumerable<Square> OSquares() => _square.Where(s => s.O);
+
+		public bool Matches(string regex)
+		{
+			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
+			return R.IsMatch(ToString());
+		}
+
 		public override string ToString()
 		{
 			return string.Join("", _square.Select(s => s.ToString()));
