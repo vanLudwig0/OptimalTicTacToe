@@ -96,7 +96,25 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Triple> WinnableX() => Triples.Where(t => t.WinnableX());
 		public IEnumerable<Triple> WinnableO() => Triples.Where(t => t.WinnableO());
 		public IEnumerable<Triple> Mixeds() => Triples.Where(t => t.Mixed());
-		public IEnumerable<Triple> Matches(string regex) => Triples.Where(t => t.Matches(regex));
+		public IEnumerable<Triple> MatchingTriples(string regex) => Triples.Where(t => t.Matches(regex));
+
+		public bool Matches(string regex, bool includingTransforms = true)
+		{
+			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
+			if (R.IsMatch(ToString())) return true;
+			if (!includingTransforms) return false;
+
+			if (R.IsMatch(string.Join("/", Rows.Select(r => r.ToReversedString())))) return true;		//Horizontal flip
+			if (R.IsMatch(string.Join("/", Rows.Reverse().Select(r => r.ToString())))) return true;     //Vertical flip
+			if (R.IsMatch(string.Join("/", Rows.Reverse().Select(r => r.ToReversedString())))) return true;     //Horizontal and Vertical flip
+
+			if (R.IsMatch(string.Join("/", Columns.Select(c => c.ToString())))) return true;       //Transpose
+			if (R.IsMatch(string.Join("/", Columns.Select(c => c.ToReversedString())))) return true;       //Transpose Horizontal flip
+			if (R.IsMatch(string.Join("/", Columns.Reverse().Select(c => c.ToString())))) return true;     //Transpose Vertical flip
+			if (R.IsMatch(string.Join("/", Columns.Reverse().Select(c => c.ToReversedString())))) return true;     //Transpose Horizontal and Vertical flip
+
+			return false;
+		}
 
 		public void Clear()
 		{

@@ -30,42 +30,59 @@ namespace OptimalTicTacToe
 				GameBoard.EmptyOutsides.RandomOrDefault().Value = "X";
 				GameBoard.EmptySquares.RandomOrDefault().Value = "O";
 
-				if (GameBoard.Middles.Any(t => t.Mixed())) continue;	//Unwinnable
-				if (GameBoard.Mixeds().Any(t => t[1].X)) continue;	//Unwinnable
+				if (GameBoard.Matches("_X_/_O_/___")) continue;     //Unwinnable
+				if (GameBoard.Matches("_X_/___/_O_")) continue;     //Unwinnable
+				if (GameBoard.Matches("OX_/___/___")) continue;     //Unwinnable
+
 				break;
 			} while (true);
 		}
 
+		//Clicked has some short sleeps in it to give the appearance of the computer thinking.  It makes it easier for the human
+		//player to see what the computer's latest move was.  Use a spin lock to prevent the human from making additional clicks
+		//during these sleeps.
+		System.Threading.SpinLock _lock = new System.Threading.SpinLock();
 		private async void Clicked(object sender, EventArgs e)
 		{
-			if (sender is Button button && string.IsNullOrEmpty(button.Text))
+			bool gotLock = false;
+			try
 			{
-				button.Text = "X";
+				_lock.Enter(ref gotLock);
 
-				await Task.Delay(500);
-
-				//X wins
-				var win = GameBoard.Triples.FirstOrDefault(triple => triple.AllX());
-				if (win != null)
+				if (sender is Button button && string.IsNullOrEmpty(button.Text))
 				{
-					_winCount++;
-					_bestWinCount = Math.Max(_bestWinCount, _winCount);
-					CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-					RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
-					ResetBoard();
-					return;
-				}
+					button.Text = "X";
 
-				//Tie.  (Remember, a tie can only occur after an X move)
-				if (GameBoard.EmptySquares.Count() == 0)
-				{
-					_winCount = 0;
-					CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-					ResetBoard();
-					return;
-				}
+					await Task.Delay(500);
 
-				await ComputerMove();
+					//X wins
+					GameEngine.Triple win = GameBoard.Triples.FirstOrDefault(triple => triple.AllX());
+					if (win != null)
+					{
+						_winCount++;
+						_bestWinCount = Math.Max(_bestWinCount, _winCount);
+						CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
+						RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
+						ResetBoard();
+						return;
+					}
+
+					//Tie.  (Remember, a tie can only occur after an X move)
+					if (GameBoard.EmptySquares.Count() == 0)
+					{
+						_winCount = 0;
+						CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
+						ResetBoard();
+						return;
+					}
+
+					await ComputerMove();
+				}
+			}
+			catch { }
+			finally
+			{
+				if (gotLock) _lock.Exit();
 			}
 		}
 
@@ -83,13 +100,12 @@ namespace OptimalTicTacToe
 				return;
 			}
 
-			//Make an intentional mistake when the first O is in the center
-			if (GameBoard.EmptySquares.Count() == 6 && GameBoard.Diagonals.Any(t => t.Matches("XOX")))
+			//Make an intentional mistake when the first O is in the center and X makes the best response
+			if (GameBoard.Matches("X__/_O_/__X"))
 			{
 				GameBoard.Corners.Where(s => s.Empty).RandomOrDefault().Value = "O";
 				return;
 			}
-
 
 			//Block an X win
 			var loseable = GameBoard.WinnableX().RandomOrDefault();

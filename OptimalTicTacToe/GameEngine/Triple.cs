@@ -49,15 +49,23 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Square> XSquares() => _square.Where(s => s.X);
 		public IEnumerable<Square> OSquares() => _square.Where(s => s.O);
 
-		public bool Matches(string regex)
+		public bool Matches(string regex, bool originalOrder = true, bool reversedOrder = true)
 		{
 			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
-			return R.IsMatch(ToString());
+			if (originalOrder && R.IsMatch(ToString())) return true;
+			if (reversedOrder && R.IsMatch(ToReversedString())) return true;
+
+			return false;
 		}
 
 		public override string ToString()
 		{
 			return string.Join("", _square.Select(s => s.ToString()));
+		}
+
+		public string ToReversedString()
+		{
+			return string.Join("", _square.Reverse().Select(s => s.ToString()));
 		}
 	}
 }
