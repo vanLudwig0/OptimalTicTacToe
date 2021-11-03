@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,8 +15,10 @@ namespace OptimalTicTacToe.GameEngine
 			_square[2] = end2;
 		}
 
+		//Indexer implementation
 		public Square this[int index] => _square[index];
 
+		//IEnumerable implementation
 		public IEnumerator<Square> GetEnumerator()
 		{
 			yield return _square[0];
@@ -30,6 +31,7 @@ namespace OptimalTicTacToe.GameEngine
 			return GetEnumerator();
 		}
 
+		//Useful queries
 		public bool AllX() => _square.All(s => s.X);
 		public bool AllO() => _square.All(s => s.O);
 		public bool AllEmpty() => _square.All(s => s.Empty);
@@ -49,6 +51,7 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Square> XSquares() => _square.Where(s => s.X);
 		public IEnumerable<Square> OSquares() => _square.Where(s => s.O);
 
+		//Check if this matches the specified regex
 		public bool Matches(string regex, bool originalOrder = true, bool reversedOrder = true)
 		{
 			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
@@ -58,11 +61,13 @@ namespace OptimalTicTacToe.GameEngine
 			return false;
 		}
 
+		//Remember Matches(...) relies on ToString, so cannot change it arbitrarily
 		public override string ToString()
 		{
 			return string.Join("", _square.Select(s => s.ToString()));
 		}
 
+		//Remember Matches(...) relies on ToReverseString, so cannot change it arbitrarily
 		public string ToReversedString()
 		{
 			return string.Join("", _square.Reverse().Select(s => s.ToString()));

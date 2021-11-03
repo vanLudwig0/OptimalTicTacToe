@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -10,7 +9,7 @@ namespace OptimalTicTacToe
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class OffensePage : ContentPage
 	{
-		public GameEngine.Board GameBoard { get; set; }
+		public GameEngine.Board GameBoard { get; }
 		private int _winCount = 0;
 		private int _bestWinCount = 0;
 
@@ -18,7 +17,7 @@ namespace OptimalTicTacToe
 		{
 			InitializeComponent();
 
-			GameBoard = new GameEngine.Board(S00, S01, S02, S10, S11, S12, S20, S21, S22);
+			GameBoard = new GameEngine.ButtonImpl.BoardButtonImpl(S00, S01, S02, S10, S11, S12, S20, S21, S22);
 			ResetBoard();
 		}
 
@@ -39,7 +38,7 @@ namespace OptimalTicTacToe
 		}
 
 		//Clicked has some short sleeps in it to give the appearance of the computer thinking.  It makes it easier for the human
-		//player to see what the computer's latest move was.  Use a spin lock to prevent the human from making additional clicks
+		//player to see what the computer's latest move was.  Using a spin lock to prevent the human from making additional clicks
 		//during these sleeps.
 		System.Threading.SpinLock _lock = new System.Threading.SpinLock();
 		private async void Clicked(object sender, EventArgs e)
