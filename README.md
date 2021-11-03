@@ -1,4 +1,4 @@
-# Optimal Tic Tac
+# Optimal Tic Tac Toe
 I took the 300-level math class Theory of Games in college.  We spent two days analyzing every possible outcome of tic tac toe assuming your opponent played flawlessly.
 Since then, I've tried to teach my nieces and nephews to recognize the patterns so they could shark their friends, but my quick lessons on paper never really clicked.
 
