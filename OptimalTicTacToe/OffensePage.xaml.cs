@@ -53,29 +53,22 @@ namespace OptimalTicTacToe
 				{
 					button.Text = "X";
 
-					await Task.Delay(500);
-
 					//X wins
 					GameEngine.Triple win = GameBoard.Triples.FirstOrDefault(triple => triple.AllX());
 					if (win != null)
 					{
-						_winCount++;
-						_bestWinCount = Math.Max(_bestWinCount, _winCount);
-						CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-						RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
-						ResetBoard();
+						await GameOver(true);
 						return;
 					}
 
 					//Tie.  (Remember, a tie can only occur after an X move)
 					if (GameBoard.EmptySquares.Count() == 0)
 					{
-						_winCount = 0;
-						CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-						ResetBoard();
+						await GameOver(false);
 						return;
 					}
 
+					await Task.Delay(350);
 					await ComputerMove();
 				}
 			}
@@ -93,10 +86,7 @@ namespace OptimalTicTacToe
 			if (winnable != null)
 			{
 				winnable.First(s => s.Empty).Value = "O";
-				_winCount = 0;
-				CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-				await Task.Delay(1000);
-				ResetBoard();
+				await GameOver(false);
 				return;
 			}
 
@@ -115,8 +105,26 @@ namespace OptimalTicTacToe
 				return;
 			}
 
-
 			GameBoard.EmptySquares.RandomOrDefault().Value = "O";
+		}
+
+		private async Task GameOver(bool positiveResult)
+		{
+			if (positiveResult)
+			{
+				_winCount++;
+				_bestWinCount = Math.Max(_bestWinCount, _winCount);
+				await Task.Delay(350);
+			}
+			else
+			{
+				_winCount = 0;
+				await Task.Delay(750);
+			}
+
+			CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
+			RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
+			ResetBoard();
 		}
 	}
 }
