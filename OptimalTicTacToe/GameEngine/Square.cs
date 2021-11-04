@@ -39,6 +39,8 @@ namespace OptimalTicTacToe.GameEngine.ButtonImpl
 	public class SquareButtonImpl : Square
 	{
 		private readonly Button _binding = null;
+		internal Button OwningButton => _binding;
+
 		public SquareButtonImpl(Button binding, int row, int column) : base(row, column)
 		{
 			_binding = binding;

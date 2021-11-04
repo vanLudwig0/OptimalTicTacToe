@@ -22,18 +22,41 @@ namespace OptimalTicTacToe
 			ResetBoard();
 		}
 
-		private readonly Random _random = new Random();
 		private void ResetBoard()
 		{
 			GameBoard.Clear();
-			var picked = GameBoard.EmptyOutsides.RandomOrDefault();
-			picked.Value = "X";
+			GameBoard.EmptyOutsides.RandomOrDefault().Value = "X";
+			RandomBlock();
 		}
 
-		private void BlockCenter(bool value)
+		//Unblock all squares after the first move
+		private void UnBlock()
 		{
-			S11.IsEnabled = !value;
-			S11.BackgroundColor = value ? Color.LightPink : Color.Transparent;
+			S00.IsEnabled = S01.IsEnabled = S02.IsEnabled = true;
+			S10.IsEnabled = S11.IsEnabled = S12.IsEnabled = true;
+			S20.IsEnabled = S21.IsEnabled = S22.IsEnabled = true;
+
+			S00.BackgroundColor = S01.BackgroundColor = S02.BackgroundColor = Color.Transparent;
+			S10.BackgroundColor = S11.BackgroundColor = S12.BackgroundColor = Color.Transparent;
+			S20.BackgroundColor = S21.BackgroundColor = S22.BackgroundColor = Color.Transparent;
+		}
+
+		//Set a few squares disable at startup to make things more interesting
+		private readonly Random _random = new Random();
+		private void RandomBlock()
+		{
+			if (GameBoard.EmptySquares.Count() != 8) return;
+			var xSquare = GameBoard.XSquares.FirstOrDefault(s => s.Edge);
+			if (xSquare == null) return;        //Should only occur if xSquare is a corner, but handles other problems too.
+
+			var blockables = GameBoard.Rows[xSquare.Row].Concat(GameBoard.Columns[xSquare.Column]).Where(s => s.Empty).Select(s => s as GameEngine.ButtonImpl.SquareButtonImpl);
+			blockables = blockables.Random(_random.Next(blockables.Count()));
+
+			foreach (var block in blockables)
+			{
+				block.OwningButton.IsEnabled = false;
+				block.OwningButton.BackgroundColor = Color.LightPink;
+			}
 		}
 
 		//Clicked has some short sleeps in it to give the appearance of the computer thinking.  It makes it easier for the human
@@ -50,6 +73,7 @@ namespace OptimalTicTacToe
 				if (sender is Button button && string.IsNullOrEmpty(button.Text))
 				{
 					button.Text = "O";
+					UnBlock();
 
 					//O wins
 					GameEngine.Triple win = GameBoard.Triples.FirstOrDefault(triple => triple.AllO());
@@ -60,7 +84,6 @@ namespace OptimalTicTacToe
 					}
 
 					await Task.Delay(350);
-					BlockCenter(false);
 					await ComputerMove();
 				}
 			}
@@ -163,7 +186,8 @@ namespace OptimalTicTacToe
 
 			if (ret.Count > 0) return ret.RandomOrDefault();
 
-			return GameBoard.EmptySquares.RandomOrDefault();
+			//Pick the square with the most remaining ways to win and hope for the best
+			return GameBoard.EmptySquares.OrderByDescending(s => GameBoard.ContainingTriples(s).Where(t => !t.AnyO()).Count()).First();
 		}
 
 		private async Task GameOver(bool positiveResult)

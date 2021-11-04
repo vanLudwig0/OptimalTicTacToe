@@ -20,7 +20,7 @@
 			<Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
 				<Label Text="Defense" HorizontalTextAlignment="Center" TextColor="White" FontSize="Title"/>
 			</Frame>
-			<Label Text="The O player can never win if X plays optimally, but can force a tie.  Prevent X from winning.  Trivial solutions are sometimes blocked." FontSize="16" Padding="30,10,30,10"/>
+			<Label Text="The O player can never win if X plays optimally, but can force a tie.  To keep things interesting, some opening moves are randomly blocked.  Prevent X from winning." FontSize="16" Padding="30,10,30,10"/>
 
 			<Grid Margin="50">
 				<Grid.Resources>
