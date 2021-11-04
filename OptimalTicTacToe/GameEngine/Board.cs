@@ -14,22 +14,22 @@ namespace OptimalTicTacToe.GameEngine
 		private Triple[] _diag = null, _rows = null, _cols = null, _mid = null;
 		public Triple[] Diagonals => _diag ?? (_diag = new Triple[]
 		{
-			new Triple(Square[0, 0], Square[1, 1], Square[2, 2]),
-			new Triple(Square[0, 2], Square[1, 1], Square[2, 0])
+			new Triple(Square[0, 0], Square[1, 1], Square[2, 2], diagonal: true),
+			new Triple(Square[0, 2], Square[1, 1], Square[2, 0], diagonal: true)
 		});
 
 		public Triple[] Rows => _rows ?? (_rows = new Triple[]
 		{
-			new Triple(Square[0, 0], Square[0, 1], Square[0, 2]),
-			new Triple(Square[1, 0], Square[1, 1], Square[1, 2]),
-			new Triple(Square[2, 0], Square[2, 1], Square[2, 2])
+			new Triple(Square[0, 0], Square[0, 1], Square[0, 2], row: true),
+			new Triple(Square[1, 0], Square[1, 1], Square[1, 2], row: true),
+			new Triple(Square[2, 0], Square[2, 1], Square[2, 2], row: true)
 		});
 
 		public Triple[] Columns => _cols ?? (_cols = new Triple[]
 		{
-			new Triple(Square[0, 0], Square[1, 0], Square[2, 0]),
-			new Triple(Square[0, 1], Square[1, 1], Square[2, 1]),
-			new Triple(Square[0, 2], Square[1, 2], Square[2, 2])
+			new Triple(Square[0, 0], Square[1, 0], Square[2, 0], column: true),
+			new Triple(Square[0, 1], Square[1, 1], Square[2, 1], column: true),
+			new Triple(Square[0, 2], Square[1, 2], Square[2, 2], column: true)
 		});
 
 		public Triple[] Middles => _mid ?? (_mid = new Triple[]
@@ -87,23 +87,24 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Triple> WinnableX() => Triples.Where(t => t.WinnableX());
 		public IEnumerable<Triple> WinnableO() => Triples.Where(t => t.WinnableO());
 		public IEnumerable<Triple> Mixeds() => Triples.Where(t => t.Mixed());
-		public IEnumerable<Triple> MatchingTriples(string regex) => Triples.Where(t => t.Matches(regex));
+		public IEnumerable<Triple> MatchingTriples(string pattern) => Triples.Where(t => t.Matches(pattern));
+		public IEnumerable<Triple> ContainingTriples(Square square) => Triples.Where(t => t.Any(s => ReferenceEquals(square, s)));
+		public Triple ContainingTriple(Square s1, Square s2) => Triples.FirstOrDefault(t => t.Any(s => ReferenceEquals(s1, s)) && t.Any(s => ReferenceEquals(s2, s)));
 
-		//Check if this matches the specified regex
-		public bool Matches(string regex, bool includingTransforms = true)
+		//Check if this matches the specified pattern
+		public bool Matches(string pattern, bool includingTransforms = true)
 		{
-			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
-			if (R.IsMatch(ToString())) return true;
+			if (pattern == ToString()) return true;
 			if (!includingTransforms) return false;
 
-			if (R.IsMatch(string.Join("/", Rows.Select(r => r.ToReversedString())))) return true;       //Horizontal flip
-			if (R.IsMatch(string.Join("/", Rows.Reverse().Select(r => r.ToString())))) return true;     //Vertical flip
-			if (R.IsMatch(string.Join("/", Rows.Reverse().Select(r => r.ToReversedString())))) return true;     //Horizontal and Vertical flip
+			if (pattern == string.Join("/", Rows.Select(r => r.ToReversedString()))) return true;       //Horizontal flip
+			if (pattern == string.Join("/", Rows.Reverse().Select(r => r.ToString()))) return true;     //Vertical flip
+			if (pattern == string.Join("/", Rows.Reverse().Select(r => r.ToReversedString()))) return true;     //Horizontal and Vertical flip
 
-			if (R.IsMatch(string.Join("/", Columns.Select(c => c.ToString())))) return true;       //Transpose
-			if (R.IsMatch(string.Join("/", Columns.Select(c => c.ToReversedString())))) return true;       //Transpose Horizontal flip
-			if (R.IsMatch(string.Join("/", Columns.Reverse().Select(c => c.ToString())))) return true;     //Transpose Vertical flip
-			if (R.IsMatch(string.Join("/", Columns.Reverse().Select(c => c.ToReversedString())))) return true;     //Transpose Horizontal and Vertical flip
+			if (pattern == string.Join("/", Columns.Select(c => c.ToString()))) return true;       //Transpose
+			if (pattern == string.Join("/", Columns.Select(c => c.ToReversedString()))) return true;       //Transpose Horizontal flip
+			if (pattern == string.Join("/", Columns.Reverse().Select(c => c.ToString()))) return true;     //Transpose Vertical flip
+			if (pattern == string.Join("/", Columns.Reverse().Select(c => c.ToReversedString()))) return true;     //Transpose Horizontal and Vertical flip
 
 			return false;
 		}
@@ -130,9 +131,9 @@ namespace OptimalTicTacToe.GameEngine.ButtonImpl
 		{
 			this.Square = new Square[3, 3]
 			{
-				{ new SquareButtonImpl(S00), new SquareButtonImpl(S01), new SquareButtonImpl(S02) },
-				{ new SquareButtonImpl(S10), new SquareButtonImpl(S11), new SquareButtonImpl(S12) },
-				{ new SquareButtonImpl(S20), new SquareButtonImpl(S21), new SquareButtonImpl(S22) }
+				{ new SquareButtonImpl(S00, 0, 0), new SquareButtonImpl(S01, 0, 1), new SquareButtonImpl(S02, 0, 2) },
+				{ new SquareButtonImpl(S10, 1, 0), new SquareButtonImpl(S11, 1, 1), new SquareButtonImpl(S12, 1, 2) },
+				{ new SquareButtonImpl(S20, 2, 0), new SquareButtonImpl(S21, 2, 1), new SquareButtonImpl(S22, 2, 2) }
 			};
 		}
 	}

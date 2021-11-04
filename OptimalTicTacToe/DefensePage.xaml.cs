@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -21,20 +22,18 @@ namespace OptimalTicTacToe
 			ResetBoard();
 		}
 
+		private readonly Random _random = new Random();
 		private void ResetBoard()
 		{
-			do
-			{
-				GameBoard.Clear();
-				GameBoard.EmptyOutsides.RandomOrDefault().Value = "X";
-				GameBoard.EmptySquares.RandomOrDefault().Value = "O";
+			GameBoard.Clear();
+			var picked = GameBoard.EmptyOutsides.RandomOrDefault();
+			picked.Value = "X";
+		}
 
-				if (GameBoard.Matches("_X_/_O_/___")) continue;     //Unwinnable
-				if (GameBoard.Matches("_X_/___/_O_")) continue;     //Unwinnable
-				if (GameBoard.Matches("OX_/___/___")) continue;     //Unwinnable
-
-				break;
-			} while (true);
+		private void BlockCenter(bool value)
+		{
+			S11.IsEnabled = !value;
+			S11.BackgroundColor = value ? Color.LightPink : Color.Transparent;
 		}
 
 		//Clicked has some short sleeps in it to give the appearance of the computer thinking.  It makes it easier for the human
@@ -50,24 +49,18 @@ namespace OptimalTicTacToe
 
 				if (sender is Button button && string.IsNullOrEmpty(button.Text))
 				{
-					button.Text = "X";
+					button.Text = "O";
 
-					//X wins
-					GameEngine.Triple win = GameBoard.Triples.FirstOrDefault(triple => triple.AllX());
+					//O wins
+					GameEngine.Triple win = GameBoard.Triples.FirstOrDefault(triple => triple.AllO());
 					if (win != null)
 					{
 						await GameOver(true);
 						return;
 					}
 
-					//Tie.  (Remember, a tie can only occur after an X move)
-					if (GameBoard.EmptySquares.Count() == 0)
-					{
-						await GameOver(false);
-						return;
-					}
-
 					await Task.Delay(350);
+					BlockCenter(false);
 					await ComputerMove();
 				}
 			}
@@ -80,31 +73,97 @@ namespace OptimalTicTacToe
 
 		private async Task ComputerMove()
 		{
-			//O wins
-			var winnable = GameBoard.WinnableO().RandomOrDefault();
+			//X wins
+			var winnable = GameBoard.WinnableX().RandomOrDefault();
 			if (winnable != null)
 			{
-				winnable.First(s => s.Empty).Value = "O";
+				winnable.First(s => s.Empty).Value = "X";
 				await GameOver(false);
 				return;
 			}
 
-			//Make an intentional mistake when the first O is in the center and X makes the best response
-			if (GameBoard.Matches("X__/_O_/__X"))
+			//X ties (considered success)
+			var last = GameBoard.EmptySquares;
+			if (last.Count() == 1)
 			{
-				GameBoard.Corners.Where(s => s.Empty).RandomOrDefault().Value = "O";
+				last.First().Value = "X";
+				await GameOver(true);
 				return;
 			}
 
-			//Block an X win
-			var loseable = GameBoard.WinnableX().RandomOrDefault();
+			//Block an O win
+			var loseable = GameBoard.WinnableO().RandomOrDefault();
 			if (loseable != null)
 			{
-				loseable.First(s => s.Empty).Value = "O";
+				loseable.First(s => s.Empty).Value = "X";
 				return;
 			}
 
-			GameBoard.EmptySquares.RandomOrDefault().Value = "O";
+			RulesEngine().Value = "X";			
+			return;
+		}
+
+		private GameEngine.Square RulesEngine()
+		{
+			//Special cases for first x in a corner
+			if (GameBoard.Matches("X__/_O_/___")) return GameBoard.Diagonals.First(t => t.Matches("XO_")).EmptySquares().First();
+			if (GameBoard.Matches("X__/_O_/__X")) return GameBoard.Corners.Where(s => s.Empty).RandomOrDefault();
+
+
+			List<GameEngine.Square> ret = new List<GameEngine.Square>();
+
+			//Find all the triples with only Xs.  These must only have one X or else it would have already been detected as a winning move.
+			var XTriples = GameBoard.Triples.Where(t => t.AnyX() && !t.AnyO()).ToList();
+
+			//If two of the x-triples share a square, that square will create a winning fork (i.e. game over the next x move)
+			for (int i = XTriples.Count - 1; i > 0; i--)
+			{
+				for (int j = i - 1; j >= 0; j--)
+				{
+					var intersection = XTriples[i].Intersection(XTriples[j]);
+					if (intersection?.Empty == true) ret.Add(intersection);
+				}
+			}
+
+			if (ret.Count > 0) return ret.RandomOrDefault();
+
+
+			//Look for a forceable fork (i.e. game over in two x moves)
+			foreach (var xTriple in XTriples)
+			{
+				var xSquare = xTriple.XSquares().First();
+
+				//If we put an x in either of xTriple's empties, o will be forced to go in the other empty.  Use that to our advantage
+				foreach (var potentialNextMove in xTriple.EmptySquares())
+				{
+					//Careful if we're forcing o to block into a something we'll have to block
+					var forcedOMove = xTriple.Where(s => !ReferenceEquals(s, xSquare) && !ReferenceEquals(s, potentialNextMove)).First();
+					var dangerousTriples = GameBoard.ContainingTriples(forcedOMove).Where(t => t.AnyO() && !t.AnyX());      
+					var dangerousSquares = dangerousTriples.SelectMany(t => t.Where(s => s.Empty && !ReferenceEquals(s, forcedOMove)));
+					if (dangerousSquares.Count() > 1) continue;
+					var dangerousSquare = dangerousSquares.FirstOrDefault();
+
+
+					foreach (var potentialWinningTriple in GameBoard.ContainingTriples(potentialNextMove).Where(t => t.AllEmpty()))
+					{
+						foreach (var potentialFork in potentialWinningTriple.Where(s => !ReferenceEquals(s, potentialNextMove)))
+						{
+							var otherPotentialWinningTriple = GameBoard.ContainingTriple(xSquare, potentialFork);
+							if (otherPotentialWinningTriple != null)
+							{
+								//We won't be able to fork if we have to block elsewhere
+								if (dangerousSquare?.Equals(potentialFork) == false) continue;
+
+								ret.Add(potentialNextMove);
+							}
+						}
+					}
+				}
+			}
+
+			if (ret.Count > 0) return ret.RandomOrDefault();
+
+			return GameBoard.EmptySquares.RandomOrDefault();
 		}
 
 		private async Task GameOver(bool positiveResult)
@@ -121,8 +180,8 @@ namespace OptimalTicTacToe
 				await Task.Delay(750);
 			}
 
-			CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-			RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
+			CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Tie" : " Ties");
+			RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Tie" : " Ties");
 			ResetBoard();
 		}
 	}

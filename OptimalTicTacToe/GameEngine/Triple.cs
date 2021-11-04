@@ -8,11 +8,15 @@ namespace OptimalTicTacToe.GameEngine
 	public class Triple : IEnumerable<Square>
 	{
 		private readonly Square[] _square = new Square[] { null, null, null };
-		public Triple(Square end1, Square middle, Square end2)
+		public Triple(Square end1, Square middle, Square end2, bool row = false, bool column = false, bool diagonal = false)
 		{
 			_square[0] = end1;
 			_square[1] = middle;
 			_square[2] = end2;
+
+			Row = row;
+			Column = column;
+			Diagonal = diagonal;
 		}
 
 		//Indexer implementation
@@ -30,6 +34,10 @@ namespace OptimalTicTacToe.GameEngine
 		{
 			return GetEnumerator();
 		}
+
+		public bool Diagonal { get; }
+		public bool Row { get; }
+		public bool Column { get; }
 
 		//Useful queries
 		public bool AllX() => _square.All(s => s.X);
@@ -51,12 +59,13 @@ namespace OptimalTicTacToe.GameEngine
 		public IEnumerable<Square> XSquares() => _square.Where(s => s.X);
 		public IEnumerable<Square> OSquares() => _square.Where(s => s.O);
 
-		//Check if this matches the specified regex
-		public bool Matches(string regex, bool originalOrder = true, bool reversedOrder = true)
+		public Square Intersection(Triple triple) => Enumerable.Intersect(this, triple).FirstOrDefault();
+
+		//Check if this matches the specified pattern
+		public bool Matches(string pattern, bool originalOrder = true, bool reversedOrder = true)
 		{
-			System.Text.RegularExpressions.Regex R = new System.Text.RegularExpressions.Regex(regex);
-			if (originalOrder && R.IsMatch(ToString())) return true;
-			if (reversedOrder && R.IsMatch(ToReversedString())) return true;
+			if (originalOrder && pattern == ToString()) return true;
+			if (reversedOrder && pattern == ToReversedString()) return true;
 
 			return false;
 		}
@@ -72,5 +81,7 @@ namespace OptimalTicTacToe.GameEngine
 		{
 			return string.Join("", _square.Reverse().Select(s => s.ToString()));
 		}
+
+		public IEnumerable<Triple> AsIEnumerable() => Enumerable.Repeat(this, 1);
 	}
 }
