@@ -10,12 +10,15 @@ namespace OptimalTicTacToe
 	public partial class OffensePage : ContentPage
 	{
 		public GameEngine.Board GameBoard { get; }
-		private int _winCount = 0;
-		private int _bestWinCount = 0;
+		public static int OffenseWinCount { get; internal set; } = 0;
+		public static int OffenseBestWinCount { get; internal set; } = 0;
 
 		public OffensePage()
 		{
 			InitializeComponent();
+
+			CurrentStreakLabel.FormattedText.Spans[1].Text = OffenseWinCount.ToString() + (OffenseWinCount == 1 ? " Win" : " Wins");
+			RecordLabel.FormattedText.Spans[1].Text = OffenseBestWinCount.ToString() + (OffenseBestWinCount == 1 ? " Win" : " Wins");
 
 			GameBoard = new GameEngine.ButtonImpl.BoardButtonImpl(S00, S01, S02, S10, S11, S12, S20, S21, S22);
 			ResetBoard();
@@ -111,18 +114,18 @@ namespace OptimalTicTacToe
 		{
 			if (positiveResult)
 			{
-				_winCount++;
-				_bestWinCount = Math.Max(_bestWinCount, _winCount);
+				OffenseWinCount++;
+				OffenseBestWinCount = Math.Max(OffenseBestWinCount, OffenseWinCount);
 				await Task.Delay(350);
 			}
 			else
 			{
-				_winCount = 0;
+				OffenseWinCount = 0;
 				await Task.Delay(750);
 			}
 
-			CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Win" : " Wins");
-			RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Win" : " Wins");
+			CurrentStreakLabel.FormattedText.Spans[1].Text = OffenseWinCount.ToString() + (OffenseWinCount == 1 ? " Win" : " Wins");
+			RecordLabel.FormattedText.Spans[1].Text = OffenseBestWinCount.ToString() + (OffenseBestWinCount == 1 ? " Win" : " Wins");
 			ResetBoard();
 		}
 	}

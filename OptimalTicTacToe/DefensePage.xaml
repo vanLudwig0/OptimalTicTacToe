@@ -78,9 +78,6 @@
 					</FormattedString>
 				</Label.FormattedText>
 			</Label>
-
-
-			<Label Text="by Scot Senyk" HorizontalOptions="Center" VerticalOptions="EndAndExpand"/>
 		</StackLayout>
 		
 	</ContentPage.Content>

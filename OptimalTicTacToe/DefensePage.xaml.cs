@@ -11,12 +11,15 @@ namespace OptimalTicTacToe
 	public partial class DefensePage : ContentPage
 	{
 		public GameEngine.Board GameBoard { get; }
-		private int _winCount = 0;
-		private int _bestWinCount = 0;
+		public static int DefenseWinCount { get; internal set; } = 0;
+		public static int DefenseBestWinCount { get; internal set; } = 0;
 
 		public DefensePage()
 		{
 			InitializeComponent();
+
+			CurrentStreakLabel.FormattedText.Spans[1].Text = DefenseWinCount.ToString() + (DefenseWinCount == 1 ? " Tie" : " Ties");
+			RecordLabel.FormattedText.Spans[1].Text = DefenseBestWinCount.ToString() + (DefenseBestWinCount == 1 ? " Tie" : " Ties");
 
 			GameBoard = new GameEngine.ButtonImpl.BoardButtonImpl(S00, S01, S02, S10, S11, S12, S20, S21, S22);
 			ResetBoard();
@@ -47,10 +50,9 @@ namespace OptimalTicTacToe
 		{
 			if (GameBoard.EmptySquares.Count() != 8) return;
 			var xSquare = GameBoard.XSquares.FirstOrDefault(s => s.Edge);
-			if (xSquare == null) return;        //Should only occur if xSquare is a corner, but handles other problems too.
 
-			var blockables = GameBoard.Rows[xSquare.Row].Concat(GameBoard.Columns[xSquare.Column]).Where(s => s.Empty).Select(s => s as GameEngine.ButtonImpl.SquareButtonImpl);
-			blockables = blockables.Random(_random.Next(blockables.Count()));
+			var blockables = (xSquare == null ? GameBoard.Outsides.Where(s => s.Empty) : GameBoard.EmptySquares).Select(s => s as OptimalTicTacToe.GameEngine.ButtonImpl.SquareButtonImpl);
+			blockables = blockables.Random(_random.Next(4));
 
 			foreach (var block in blockables)
 			{
@@ -83,7 +85,7 @@ namespace OptimalTicTacToe
 						return;
 					}
 
-					await Task.Delay(350);
+					await Task.Delay(350); 
 					await ComputerMove();
 				}
 			}
@@ -122,37 +124,51 @@ namespace OptimalTicTacToe
 				return;
 			}
 
-			RulesEngine().Value = "X";			
+			RulesEngine().Value = "X";
 			return;
 		}
 
 		private GameEngine.Square RulesEngine()
 		{
-			//Special cases for first x in a corner
+			//Special case for first x in a corner
 			if (GameBoard.Matches("X__/_O_/___")) return GameBoard.Diagonals.First(t => t.Matches("XO_")).EmptySquares().First();
-			if (GameBoard.Matches("X__/_O_/__X")) return GameBoard.Corners.Where(s => s.Empty).RandomOrDefault();
-
-
+			
 			List<GameEngine.Square> ret = new List<GameEngine.Square>();
 
 			//Find all the triples with only Xs.  These must only have one X or else it would have already been detected as a winning move.
 			var XTriples = GameBoard.Triples.Where(t => t.AnyX() && !t.AnyO()).ToList();
 
 			//If two of the x-triples share a square, that square will create a winning fork (i.e. game over the next x move)
-			for (int i = XTriples.Count - 1; i > 0; i--)
+			Parallel.For (1, XTriples.Count, i =>
 			{
 				for (int j = i - 1; j >= 0; j--)
 				{
 					var intersection = XTriples[i].Intersection(XTriples[j]);
-					if (intersection?.Empty == true) ret.Add(intersection);
+					if (intersection?.Empty == true) lock (ret) { ret.Add(intersection); }
 				}
-			}
+			});
+
+			if (ret.Count > 0) return ret.RandomOrDefault();
+
+
+			//Find all the triples with only Os.  These must only have one O or else it would have already been detected as a needed block.
+			var OTriples = GameBoard.Triples.Where(t => t.AnyO() && !t.AnyX()).ToList();
+
+			//If two of the o-triples share a square, that square will create a losing fork (i.e. game over the next o move)
+			Parallel.For(1, OTriples.Count, i =>
+			{
+				for (int j = i - 1; j >= 0; j--)
+				{
+					var intersection = OTriples[i].Intersection(OTriples[j]);
+					if (intersection?.Empty == true) lock (ret) { ret.Add(intersection); }
+				}
+			});
 
 			if (ret.Count > 0) return ret.RandomOrDefault();
 
 
 			//Look for a forceable fork (i.e. game over in two x moves)
-			foreach (var xTriple in XTriples)
+			Parallel.ForEach(XTriples, xTriple =>
 			{
 				var xSquare = xTriple.XSquares().First();
 
@@ -161,7 +177,7 @@ namespace OptimalTicTacToe
 				{
 					//Careful if we're forcing o to block into a something we'll have to block
 					var forcedOMove = xTriple.Where(s => !ReferenceEquals(s, xSquare) && !ReferenceEquals(s, potentialNextMove)).First();
-					var dangerousTriples = GameBoard.ContainingTriples(forcedOMove).Where(t => t.AnyO() && !t.AnyX());      
+					var dangerousTriples = GameBoard.ContainingTriples(forcedOMove).Where(t => t.AnyO() && !t.AnyX());
 					var dangerousSquares = dangerousTriples.SelectMany(t => t.Where(s => s.Empty && !ReferenceEquals(s, forcedOMove)));
 					if (dangerousSquares.Count() > 1) continue;
 					var dangerousSquare = dangerousSquares.FirstOrDefault();
@@ -177,12 +193,12 @@ namespace OptimalTicTacToe
 								//We won't be able to fork if we have to block elsewhere
 								if (dangerousSquare?.Equals(potentialFork) == false) continue;
 
-								ret.Add(potentialNextMove);
+								lock (ret) { ret.Add(potentialNextMove); }
 							}
 						}
 					}
 				}
-			}
+			});
 
 			if (ret.Count > 0) return ret.RandomOrDefault();
 
@@ -194,18 +210,18 @@ namespace OptimalTicTacToe
 		{
 			if (positiveResult)
 			{
-				_winCount++;
-				_bestWinCount = Math.Max(_bestWinCount, _winCount);
+				DefenseWinCount++;
+				DefenseBestWinCount = Math.Max(DefenseBestWinCount, DefenseWinCount);
 				await Task.Delay(350);
 			}
 			else
 			{
-				_winCount = 0;
+				DefenseWinCount = 0;
 				await Task.Delay(750);
 			}
 
-			CurrentStreakLabel.FormattedText.Spans[1].Text = _winCount.ToString() + (_winCount == 1 ? " Tie" : " Ties");
-			RecordLabel.FormattedText.Spans[1].Text = _bestWinCount.ToString() + (_bestWinCount == 1 ? " Tie" : " Ties");
+			CurrentStreakLabel.FormattedText.Spans[1].Text = DefenseWinCount.ToString() + (DefenseWinCount == 1 ? " Tie" : " Ties");
+			RecordLabel.FormattedText.Spans[1].Text = DefenseBestWinCount.ToString() + (DefenseBestWinCount == 1 ? " Tie" : " Ties");
 			ResetBoard();
 		}
 	}
