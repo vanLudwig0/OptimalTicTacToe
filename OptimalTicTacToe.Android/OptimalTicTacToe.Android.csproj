@@ -103,4 +103,20 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+	<Target Name="UpdateBuildNumber" BeforeTargets="BeforeBuild">
+		<PropertyGroup>
+			<BuildID>
+				$([System.DateTime]::Now.ToString(yyMMdd))$([System.Convert]::ToUInt16(
+				$([System.Math]::Floor(
+				$([MSBuild]::Divide(
+				$([System.DateTime]::Now.TimeOfDay.TotalMinutes),
+				144
+				))
+				))
+				))
+			</BuildID>
+			<CurrentTicks>$([System.DateTime]::Now.AddDays(30).Ticks.ToString())</CurrentTicks>
+		</PropertyGroup>
+		<XmlPoke XmlInputPath="Properties/AndroidManifest.xml" Namespaces="&lt;Namespace Prefix='android' Uri='http://schemas.android.com/apk/res/android' /&gt;" Query="manifest/@android:versionCode" Value="$(BuildID)" />
+	</Target>
 </Project>
