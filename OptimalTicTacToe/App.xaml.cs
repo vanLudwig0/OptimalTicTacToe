@@ -29,10 +29,11 @@ namespace OptimalTicTacToe
 
 		protected override void OnResume()
 		{
-			OffensePage.OffenseWinCount = (Current.Properties["OffenseWinCount"] as int?) ?? 0;
-			OffensePage.OffenseBestWinCount = (Current.Properties["OffenseBestWinCount"] as int?) ?? 0;
-			DefensePage.DefenseWinCount = (Current.Properties["DefenseWinCount"] as int?) ?? 0;
-			DefensePage.DefenseBestWinCount = (Current.Properties["DefenseBestWinCount"] as int?) ?? 0;
+			object value;
+			if (Current.Properties.TryGetValue("OffenseWinCount", out value)) OffensePage.OffenseWinCount = (value as int?) ?? 0; else OffensePage.OffenseWinCount = 0;
+			if (Current.Properties.TryGetValue("OffenseBestWinCount", out value)) OffensePage.OffenseBestWinCount = (value as int?) ?? 0; else OffensePage.OffenseBestWinCount = 0;
+			if (Current.Properties.TryGetValue("DefenseWinCount", out value)) DefensePage.DefenseWinCount = (value as int?) ?? 0; else DefensePage.DefenseWinCount = 0;
+			if (Current.Properties.TryGetValue("DefenseBestWinCount", out value)) DefensePage.DefenseBestWinCount = (value as int?) ?? 0; else DefensePage.DefenseBestWinCount = 0;
 		}
 	}
 }
